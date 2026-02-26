@@ -22,7 +22,7 @@ import type {
 import { startRelayStream, type StreamCallbacks } from "../relay/stream.js";
 import { getKakaoRuntime } from "../runtime.js";
 import { sendReply, RelayHttpError } from "../relay/client.js";
-import { stripMarkdown } from "../kakao/response.js";
+import { stripMarkdown, stripReasoning } from "../kakao/response.js";
 import { PLUGIN_COMMANDS } from "../commands/registry.js";
 
 /**
@@ -414,9 +414,12 @@ async function handleInboundMessage(
                 template.quickReplies = cardData.quickReplies.slice(0, 10);
               }
             } else {
-              // 2️⃣ 일반 텍스트
-              const plainText = stripMarkdown(outboundPayload.text);
-              template.outputs.push({ simpleText: { text: plainText } });
+              // 2️⃣ 일반 텍스트 — reasoning 블록 제거 후 마크다운 제거
+              const cleaned = stripReasoning(outboundPayload.text);
+              if (cleaned) {
+                const plainText = stripMarkdown(cleaned);
+                template.outputs.push({ simpleText: { text: plainText } });
+              }
             }
           }
         }

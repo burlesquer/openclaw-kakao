@@ -22,6 +22,48 @@ import type {
 } from "../types.js";
 
 /**
+ * Strip model reasoning/thinking blocks from response text.
+ *
+ * Some models prefix responses with reasoning blocks like:
+ *   Reasoning:\n_internal thought..._\n\nActual response
+ *   Thinking:\ninternal thought\n\nActual response
+ *
+ * This function removes those blocks so only the user-facing response is sent.
+ */
+export function stripReasoning(text: string): string {
+  if (!text) return text;
+
+  // Strip "Reasoning:" or "Thinking:" block at the start, ending at double newline
+  const stripped = text.replace(
+    /^(?:\*\*)?(?:Reasoning|Thinking):?(?:\*\*)?\s*\n[\s\S]*?\n\n/i,
+    ""
+  );
+
+  const result = stripped.trim();
+
+  // If stripping removed content and something remains, return it
+  if (result.length > 0 && result !== text.trim()) {
+    return result;
+  }
+
+  // If the entire text is a single reasoning block (no double newline separator),
+  // return empty — the model only output reasoning with no actual response
+  if (/^(?:\*\*)?(?:Reasoning|Thinking):?\s*(?:\*\*)?\s*\n/i.test(text)) {
+    // Remove prefix and any italic/bold wrapping from the reasoning content
+    const withoutPrefix = text.replace(
+      /^(?:\*\*)?(?:Reasoning|Thinking):?(?:\*\*)?\s*\n/i,
+      ""
+    ).trim();
+    // If what remains looks like internal reasoning (wrapped in _ or *), return empty
+    if (/^[_*].*[_*]$/s.test(withoutPrefix)) {
+      return "";
+    }
+  }
+
+  return text;
+}
+
+/**
  * Strip markdown formatting from text for Kakao (which doesn't support markdown)
  *
  * Handles:

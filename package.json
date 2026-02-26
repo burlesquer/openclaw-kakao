@@ -1,6 +1,6 @@
 {
   "name": "openclaw-kakao",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "OpenClaw Kakao plugin for KakaoTalk channel integration",
   "type": "module",
   "main": "dist/index.js",
