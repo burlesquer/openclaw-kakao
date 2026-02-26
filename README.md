@@ -13,35 +13,34 @@
 
 ## 설치
 
-이 패키지는 npm 레지스트리에 게시되지 않습니다 (`private: true`). 로컬 설치만 지원합니다.
+### npm 설치 (권장)
 
-### 1. 의존성 설치
+GitHub Packages 레지스트리를 등록합니다 (최초 1회):
 
 ```bash
-cd openclaw-kakao
-pnpm install    # 또는 npm install
+echo "@burlesquer:registry=https://npm.pkg.github.com" >> ~/.npmrc
 ```
 
-> **필수**: 의존성을 설치하지 않으면 `Cannot find module 'zod'` 에러가 발생합니다.
-
-### 2. OpenClaw에 플러그인 등록
+플러그인 설치:
 
 ```bash
-# 링크 모드 (개발용, 소스 수정 즉시 반영)
-openclaw plugins install -l ./openclaw-kakao
-
-# 복사 모드 (프로덕션, 빌드 필요)
-pnpm run build
-openclaw plugins install ./openclaw-kakao
-```
-
-### 3. 게이트웨이 재시작
-
-```bash
+openclaw plugins install @burlesquer/openclaw-kakao
 openclaw gateway restart
 ```
 
-### 4. 설치 확인
+### 로컬 설치 (개발용)
+
+소스를 직접 수정하며 개발할 때 사용합니다.
+
+```bash
+git clone https://github.com/burlesquer/openclaw-kakao.git
+cd openclaw-kakao
+pnpm install    # 필수: 의존성 미설치 시 'Cannot find module' 에러 발생
+openclaw plugins install -l .
+openclaw gateway restart
+```
+
+### 설치 확인
 
 ```bash
 openclaw plugins list    # openclaw-kakao가 loaded 상태인지 확인
@@ -53,13 +52,12 @@ openclaw channels list   # 채널 목록에 표시되는지 확인
 ## 전체 구동 순서
 
 ```
-1. kakao-relay 서버 시작     →  docker compose up -d (../kakao-relay/)
-2. 플러그인 의존성 설치       →  pnpm install
-3. 플러그인 등록             →  openclaw plugins install -l ./openclaw-kakao
-4. OpenClaw 설정             →  relayUrl 지정 (~/.openclaw/openclaw.json)
-5. 게이트웨이 재시작          →  openclaw gateway restart
-6. 카카오 오픈빌더 스킬 연결  →  스킬 URL을 릴레이 서버로 설정
-7. 카카오톡에서 페어링        →  /pair <코드>
+1. kakao-relay 서버 시작     →  docker compose up -d (kakao-relay/)
+2. 플러그인 설치             →  openclaw plugins install @burlesquer/openclaw-kakao
+3. OpenClaw 설정             →  relayUrl 지정 (~/.openclaw/openclaw.json)
+4. 게이트웨이 재시작          →  openclaw gateway restart
+5. 카카오 오픈빌더 스킬 연결  →  스킬 URL을 릴레이 서버로 설정
+6. 카카오톡에서 페어링        →  /pair <코드>
 ```
 
 ---
