@@ -15,16 +15,8 @@
 
 ### npm 설치 (권장)
 
-GitHub Packages 레지스트리를 등록합니다 (최초 1회):
-
 ```bash
-echo "@burlesquer:registry=https://npm.pkg.github.com" >> ~/.npmrc
-```
-
-플러그인 설치:
-
-```bash
-openclaw plugins install @burlesquer/openclaw-kakao
+openclaw plugins install openclaw-kakao
 openclaw gateway restart
 ```
 
@@ -60,7 +52,7 @@ openclaw gateway restart
 
 ```
 1. kakao-relay 서버 시작     →  docker compose up -d (kakao-relay/)
-2. 플러그인 설치             →  openclaw plugins install @burlesquer/openclaw-kakao
+2. 플러그인 설치             →  openclaw plugins install openclaw-kakao
 3. OpenClaw 설정             →  relayUrl 지정 (~/.openclaw/openclaw.json)
 4. 게이트웨이 재시작          →  openclaw gateway restart
 5. 카카오 오픈빌더 스킬 연결  →  스킬 URL을 릴레이 서버로 설정

@@ -1,5 +1,5 @@
 {
-  "name": "@burlesquer/openclaw-kakao",
+  "name": "openclaw-kakao",
   "version": "0.0.1",
   "description": "OpenClaw Kakao plugin for KakaoTalk channel integration",
   "type": "module",
@@ -72,7 +72,6 @@
   },
   "license": "MIT",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
   "engines": {
