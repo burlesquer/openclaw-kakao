@@ -103,20 +103,19 @@ curl http://localhost:8080/health  # 헬스체크
 
 1. 릴레이 서버 실행 (로컬 또는 클라우드 배포)
 2. [카카오 i 오픈빌더](https://i.kakao.com/)에서 챗봇 생성 및 스킬 연결
-3. 릴레이 서버 Admin UI에서 Account 생성 후 `relayToken` 발급 (또는 자동 세션 사용)
-4. 플러그인 설정에서 `relayUrl`과 `relayToken` 지정
+3. 릴레이 서버 대시보드에서 relay token 발급
+4. `~/.openclaw/openclaw.json`에 `relayUrl`과 `relayToken` 설정
+5. `openclaw gateway restart`
 
----
+### relay token 발급
 
-## 설정 레퍼런스
+릴레이 서버 대시보드(`http://<relay-server>/dashboard/`)에서 Account를 생성하면 relay token이 발급됩니다.
 
-릴레이 서버 배포 후 `relayUrl`을 반드시 설정해야 합니다.
+> **중요**: 토큰은 생성 시 한 번만 표시됩니다. 반드시 복사해서 안전하게 보관하세요.
 
-### 설정 파일 위치
+### OpenClaw 설정
 
-`~/.openclaw/openclaw.json` 또는 `config.yaml`
-
-### 설정 구조
+`~/.openclaw/openclaw.json`을 편집하여 `channels`에 다음을 추가합니다:
 
 ```json
 {
@@ -125,14 +124,32 @@ curl http://localhost:8080/health  # 헬스체크
       "accounts": {
         "default": {
           "relayUrl": "https://your-relay-server.example.com",
-          "relayToken": "발급받은_토큰",
+          "relayToken": "대시보드에서_발급받은_토큰",
+          "enabled": true,
           "dmPolicy": "pairing"
         }
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "openclaw-kakao": {
+        "enabled": true
       }
     }
   }
 }
 ```
+
+설정 후 게이트웨이를 재시작합니다:
+
+```bash
+openclaw gateway restart
+```
+
+---
+
+## 설정 레퍼런스
 
 ### 전체 옵션
 
