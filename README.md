@@ -9,7 +9,7 @@
 - Node.js 22.12+
 - pnpm (권장) 또는 npm
 - OpenClaw ≥ 2026.1.29
-- [kakao-relay](../kakao-relay/) 서버 (별도 실행 필요)
+- [kakao-relay](https://github.com/burlesquer/kakao-relay) 서버 (별도 실행 필요)
 
 ## 설치
 
@@ -93,7 +93,7 @@ openclaw gateway restart
 
 ## 릴레이 서버
 
-이 플러그인은 **[kakao-relay](../kakao-relay/)** 서버를 통해 카카오톡 채널과 통신합니다. 사용하려면 릴레이 서버를 먼저 실행해야 합니다.
+이 플러그인은 **[kakao-relay](https://github.com/burlesquer/kakao-relay)** 서버를 통해 카카오톡 채널과 통신합니다. 사용하려면 릴레이 서버를 먼저 실행해야 합니다.
 
 ### 로컬 개발 시
 
@@ -105,7 +105,7 @@ curl http://localhost:8080/health  # 헬스체크
 
 릴레이 서버 대시보드: http://localhost:8080/dashboard/
 
-> 카카오 웹훅을 로컬에서 받으려면 ngrok 등 터널링이 필요합니다. 자세한 내용은 [kakao-relay README](../kakao-relay/README.md#ngrok-로컬-개발)를 참고하세요.
+> 카카오 웹훅을 로컬에서 받으려면 ngrok 등 터널링이 필요합니다. 자세한 내용은 [kakao-relay README](https://github.com/burlesquer/kakao-relay#ngrok-로컬-개발)를 참고하세요.
 
 ### 설정 순서
 
