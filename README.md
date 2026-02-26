@@ -103,15 +103,9 @@ curl http://localhost:8080/health  # 헬스체크
 
 1. 릴레이 서버 실행 (로컬 또는 클라우드 배포)
 2. [카카오 i 오픈빌더](https://i.kakao.com/)에서 챗봇 생성 및 스킬 연결
-3. 릴레이 서버 대시보드에서 relay token 발급
-4. `~/.openclaw/openclaw.json`에 `relayUrl`과 `relayToken` 설정
-5. `openclaw gateway restart`
-
-### relay token 발급
-
-릴레이 서버 대시보드(`http://<relay-server>/dashboard/`)에서 Account를 생성하면 relay token이 발급됩니다.
-
-> **중요**: 토큰은 생성 시 한 번만 표시됩니다. 반드시 복사해서 안전하게 보관하세요.
+3. `~/.openclaw/openclaw.json`에 `relayUrl` 설정
+4. `openclaw gateway restart`
+5. 카카오톡에서 `/pair <코드>` 입력하여 페어링
 
 ### OpenClaw 설정
 
@@ -124,7 +118,6 @@ curl http://localhost:8080/health  # 헬스체크
       "accounts": {
         "default": {
           "relayUrl": "https://your-relay-server.example.com",
-          "relayToken": "대시보드에서_발급받은_토큰",
           "enabled": true,
           "dmPolicy": "pairing"
         }
@@ -147,6 +140,8 @@ curl http://localhost:8080/health  # 헬스체크
 openclaw gateway restart
 ```
 
+> **참고**: `relayToken`은 수동으로 설정하지 마세요. 플러그인이 자동으로 세션을 생성하고, 페어링 완료 시 토큰을 자동 획득합니다. SSE 연결에는 session token이 필요하며, relay token으로는 SSE에 연결할 수 없습니다.
+
 ---
 
 ## 설정 레퍼런스
@@ -163,7 +158,6 @@ openclaw gateway restart
 
 | 옵션 | 타입 | 기본값 | 설명 |
 |------|------|--------|------|
-| `relayToken` | string | — | 릴레이 인증 토큰 (환경변수 `OPENCLAW_TALKCHANNEL_RELAY_TOKEN`으로도 설정 가능) |
 | `enabled` | boolean | `true` | 채널 활성화 여부 |
 | `dmPolicy` | string | `"pairing"` | DM 정책 |
 | `allowFrom` | string[] | — | `allowlist` 모드 허용 사용자 ID 목록 |
