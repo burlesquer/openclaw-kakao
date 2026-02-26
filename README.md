@@ -47,6 +47,13 @@ openclaw plugins list    # openclaw-kakao가 loaded 상태인지 확인
 openclaw channels list   # 채널 목록에 표시되는지 확인
 ```
 
+### 제거
+
+```bash
+openclaw plugins uninstall openclaw-kakao
+openclaw gateway restart
+```
+
 ---
 
 ## 전체 구동 순서
