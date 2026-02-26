@@ -4,16 +4,62 @@
 
 ---
 
+## 요구사항
+
+- Node.js 22.12+
+- pnpm (권장) 또는 npm
+- OpenClaw ≥ 2026.1.29
+- [kakao-relay](../kakao-relay/) 서버 (별도 실행 필요)
+
 ## 설치
 
 이 패키지는 npm 레지스트리에 게시되지 않습니다 (`private: true`). 로컬 설치만 지원합니다.
+
+### 1. 의존성 설치
+
+```bash
+cd openclaw-kakao
+pnpm install    # 또는 npm install
+```
+
+> **필수**: 의존성을 설치하지 않으면 `Cannot find module 'zod'` 에러가 발생합니다.
+
+### 2. OpenClaw에 플러그인 등록
 
 ```bash
 # 링크 모드 (개발용, 소스 수정 즉시 반영)
 openclaw plugins install -l ./openclaw-kakao
 
-# 복사 모드
+# 복사 모드 (프로덕션, 빌드 필요)
+pnpm run build
 openclaw plugins install ./openclaw-kakao
+```
+
+### 3. 게이트웨이 재시작
+
+```bash
+openclaw gateway restart
+```
+
+### 4. 설치 확인
+
+```bash
+openclaw plugins list    # openclaw-kakao가 loaded 상태인지 확인
+openclaw channels list   # 채널 목록에 표시되는지 확인
+```
+
+---
+
+## 전체 구동 순서
+
+```
+1. kakao-relay 서버 시작     →  docker compose up -d (../kakao-relay/)
+2. 플러그인 의존성 설치       →  pnpm install
+3. 플러그인 등록             →  openclaw plugins install -l ./openclaw-kakao
+4. OpenClaw 설정             →  relayUrl 지정 (~/.openclaw/openclaw.json)
+5. 게이트웨이 재시작          →  openclaw gateway restart
+6. 카카오 오픈빌더 스킬 연결  →  스킬 URL을 릴레이 서버로 설정
+7. 카카오톡에서 페어링        →  /pair <코드>
 ```
 
 ---
@@ -42,13 +88,25 @@ openclaw plugins install ./openclaw-kakao
 
 ## 릴레이 서버
 
-이 플러그인은 **릴레이 서버**를 통해 카카오톡 채널과 통신합니다. 사용하려면 릴레이 서버를 배포해야 합니다.
+이 플러그인은 **[kakao-relay](../kakao-relay/)** 서버를 통해 카카오톡 채널과 통신합니다. 사용하려면 릴레이 서버를 먼저 실행해야 합니다.
+
+### 로컬 개발 시
+
+```bash
+cd ../kakao-relay
+docker compose up -d          # PostgreSQL + Redis + 릴레이 서버
+curl http://localhost:8080/health  # 헬스체크
+```
+
+릴레이 서버 대시보드: http://localhost:8080/dashboard/
+
+> 카카오 웹훅을 로컬에서 받으려면 ngrok 등 터널링이 필요합니다. 자세한 내용은 [kakao-relay README](../kakao-relay/README.md#ngrok-로컬-개발)를 참고하세요.
 
 ### 설정 순서
 
-1. 릴레이 서버 배포
+1. 릴레이 서버 실행 (로컬 또는 클라우드 배포)
 2. [카카오 i 오픈빌더](https://i.kakao.com/)에서 챗봇 생성 및 스킬 연결
-3. 릴레이 서버 Admin UI에서 Account 생성 후 `relayToken` 발급
+3. 릴레이 서버 Admin UI에서 Account 생성 후 `relayToken` 발급 (또는 자동 세션 사용)
 4. 플러그인 설정에서 `relayUrl`과 `relayToken` 지정
 
 ---
