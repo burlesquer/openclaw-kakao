@@ -376,12 +376,29 @@ async function handleInboundMessage(
   // Dispatch to OpenClaw agent system
   // NOTE: Kakao replies are sent via relay `sendReply` in `deliver`, not core
   // `infra/outbound/deliver.ts`, so write-ahead queue/hook behavior differs.
+  // Buffer delivers — Kakao callback URL can only be used once,
+  // so we collect the latest payload and send only on onIdle (final).
+  // Slack edits messages progressively, but Kakao cannot edit.
+  let bufferedPayload: DeliverPayload | null = null;
+
   await channel.reply.dispatchReplyWithBufferedBlockDispatcher({
     ctx: ctxPayload,
     cfg,
     dispatcherOptions: {
       deliver: async (payload: unknown) => {
-        const outboundPayload = payload as DeliverPayload;
+        // Buffer only — actual send happens in onIdle
+        bufferedPayload = payload as DeliverPayload;
+      },
+      onReplyStart: async () => {
+        // Could send typing indicator if supported
+      },
+      onIdle: async () => {
+        // Send the final buffered payload (called when agent finishes)
+        if (!bufferedPayload) return;
+
+        const outboundPayload = bufferedPayload;
+        bufferedPayload = null;
+
         const template: KakaoSkillResponse["template"] = { outputs: [] };
         const kakaoData = outboundPayload.channelData?.kakao;
 
@@ -405,11 +422,9 @@ async function handleInboundMessage(
             // 1️⃣ JSON 카드 감지 시도
             const cardData = tryParseKakaoCard(outboundPayload.text);
             if (cardData) {
-              // 카드로 변환
               const cardOutputs = buildOutputsFromChannelData(cardData);
               template.outputs.push(...cardOutputs);
 
-              // quickReplies도 처리
               if (cardData.quickReplies && cardData.quickReplies.length > 0) {
                 template.quickReplies = cardData.quickReplies.slice(0, 10);
               }
@@ -437,7 +452,6 @@ async function handleInboundMessage(
             template.quickReplies = [];
           }
 
-          // 경고 버튼을 맨 앞에 추가
           template.quickReplies.unshift(
             {
               label: `💡 /compact (${messageCount}개)`,
@@ -451,7 +465,6 @@ async function handleInboundMessage(
             }
           );
 
-          // 최대 10개 제한
           template.quickReplies = template.quickReplies.slice(0, 10);
         }
 
@@ -474,12 +487,6 @@ async function handleInboundMessage(
           const errMsg = err instanceof Error ? err.message : String(err);
           log?.error(`[openclaw-kakao:${account.talkchannelId}] Reply failed: ${errMsg}`);
         }
-      },
-      onReplyStart: async () => {
-        // Could send typing indicator if supported
-      },
-      onIdle: async () => {
-        // Stop typing indicator
       },
       onError: (err: Error, info: { kind: string }) => {
         log?.error(`[openclaw-kakao:${account.talkchannelId}] Dispatch ${info.kind} error: ${err.message}`);
